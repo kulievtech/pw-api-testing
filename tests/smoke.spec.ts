@@ -5,13 +5,13 @@ import { faker } from "@faker-js/faker";
 test.describe("Conduit API suite", () => {
   let authToken: string;
 
-  test.beforeAll("Run before all tests", async ({ api }) => {
+  test.beforeAll("Run before all tests", async ({ api, config }) => {
     const loginResponse = await api
       .path("/users/login")
       .body({
         user: {
-          email: "tohirqatest@gmail.com",
-          password: "qatest12345",
+          email: config.userEmail,
+          password: config.userPassword,
         },
       })
       .postRequest(200);
