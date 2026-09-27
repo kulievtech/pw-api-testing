@@ -3,14 +3,19 @@ import { expect } from "../utils/custom-expect";
 import { test } from "../utils/fixtures";
 import { faker } from "@faker-js/faker";
 
-test.describe("Conduit API suite", () => {
-  let authToken: string;
+test.describe("Conduit API suite", { tag: "@smoke" }, () => {
+  test("Get All Articles without Auth", async ({ api }) => {
+    const response = await api
+      .path("/articles")
+      .params({ limit: "10", offset: "0" })
+      .clearAuth()
+      .getRequest(200);
 
-  test.beforeAll("Run before all tests", async ({ api, config }) => {
-    authToken = await createToken(config.userEmail, config.userPassword);
+    expect(response.articles.length).shouldBeLessThanOrEqual(10);
+    expect(response.articlesCount).shouldEqual(10);
   });
 
-  test("Get All Articles", async ({ api }) => {
+  test("Get All Articles with Auth", async ({ api }) => {
     const response = await api
       .path("/articles")
       .params({ limit: "10", offset: "0" })
@@ -46,7 +51,6 @@ test.describe("Conduit API suite", () => {
     // Create a new article
     const newArticleResponse = await api
       .path("/articles")
-      .headers({ Authorization: authToken })
       .body(articleData)
       .postRequest(201);
 
@@ -67,10 +71,7 @@ test.describe("Conduit API suite", () => {
     expect(actualTags).shouldEqual(expectedTags);
 
     // Delete the created article
-    await api
-      .path(`/articles/${articleSlug}`)
-      .headers({ Authorization: authToken })
-      .deleteRequest(204);
+    await api.path(`/articles/${articleSlug}`).deleteRequest(204);
   });
 
   test("Create, Update, and Delete Article", async ({ api }) => {
@@ -92,7 +93,6 @@ test.describe("Conduit API suite", () => {
     // Create a new article
     const newArticleResponse = await api
       .path("/articles")
-      .headers({ Authorization: authToken })
       .body(articleData)
       .postRequest(201);
 
@@ -124,7 +124,6 @@ test.describe("Conduit API suite", () => {
 
     const updatedArticleResponse = await api
       .path(`/articles/${articleSlug}`)
-      .headers({ Authorization: authToken })
       .body(updatedArticleData)
       .putRequest(200);
 
@@ -151,9 +150,6 @@ test.describe("Conduit API suite", () => {
     expect(actualUpdatedTags).shouldEqual(expectedUpdatedTags);
 
     // Delete the updated article
-    await api
-      .path(`/articles/${updatedArticleSlug}`)
-      .headers({ Authorization: authToken })
-      .deleteRequest(204);
+    await api.path(`/articles/${updatedArticleSlug}`).deleteRequest(204);
   });
 });

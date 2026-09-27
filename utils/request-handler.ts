@@ -10,15 +10,19 @@ export class RequestHandler {
   private queryParams: object = {};
   private requestHeaders: Record<string, string> = {};
   private requestBody: object = {};
+  private defaultAuthToken: string = "";
+  private clearAuthFlag: boolean = false;
 
   constructor(
     request: APIRequestContext,
     apiBaseUrl: string,
     logger: APILogger,
+    authToken: string = "",
   ) {
     this.request = request;
     this.defaultBaseUrl = apiBaseUrl;
     this.logger = logger;
+    this.defaultAuthToken = authToken;
   }
 
   url(url: string): RequestHandler {
@@ -46,6 +50,11 @@ export class RequestHandler {
     return this;
   }
 
+  clearAuth(): RequestHandler {
+    this.clearAuthFlag = true;
+    return this;
+  }
+
   /**
    * Sends a GET request and verifies the expected response status code.
    *
@@ -55,10 +64,10 @@ export class RequestHandler {
   async getRequest(statusCode: number) {
     const url = this.getUrl();
 
-    this.logger.logRequest("GET", url, this.requestHeaders);
+    this.logger.logRequest("GET", url, this.getHeaders());
 
     const response = await this.request.get(url, {
-      headers: this.requestHeaders,
+      headers: this.getHeaders(),
     });
 
     this.cleanUpFields();
@@ -81,10 +90,10 @@ export class RequestHandler {
   async postRequest(statusCode: number) {
     const url = this.getUrl();
 
-    this.logger.logRequest("POST", url, this.requestHeaders, this.requestBody);
+    this.logger.logRequest("POST", url, this.getHeaders(), this.requestBody);
 
     const response = await this.request.post(url, {
-      headers: this.requestHeaders,
+      headers: this.getHeaders(),
       data: this.requestBody,
     });
 
@@ -108,10 +117,10 @@ export class RequestHandler {
   async putRequest(statusCode: number) {
     const url = this.getUrl();
 
-    this.logger.logRequest("PUT", url, this.requestHeaders, this.requestBody);
+    this.logger.logRequest("PUT", url, this.getHeaders(), this.requestBody);
 
     const response = await this.request.put(url, {
-      headers: this.requestHeaders,
+      headers: this.getHeaders(),
       data: this.requestBody,
     });
 
@@ -134,10 +143,10 @@ export class RequestHandler {
   async deleteRequest(statusCode: number) {
     const url = this.getUrl();
 
-    this.logger.logRequest("DELETE", url, this.requestHeaders);
+    this.logger.logRequest("DELETE", url, this.getHeaders());
 
     const response = await this.request.delete(url, {
-      headers: this.requestHeaders,
+      headers: this.getHeaders(),
     });
 
     this.cleanUpFields();
@@ -175,11 +184,21 @@ export class RequestHandler {
     }
   }
 
+  private getHeaders() {
+    if (!this.clearAuthFlag) {
+      this.requestHeaders["Authorization"] =
+        this.requestHeaders["Authorization"] || this.defaultAuthToken;
+    }
+
+    return this.requestHeaders;
+  }
+
   private cleanUpFields() {
     this.requestBody = {};
     this.requestHeaders = {};
     this.queryParams = {};
     this.baseUrl = undefined;
     this.apiPath = "";
+    this.clearAuthFlag = false;
   }
 }
