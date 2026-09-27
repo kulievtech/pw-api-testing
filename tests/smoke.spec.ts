@@ -1,3 +1,4 @@
+import { createToken } from "../helpers/create-token";
 import { expect } from "../utils/custom-expect";
 import { test } from "../utils/fixtures";
 import { faker } from "@faker-js/faker";
@@ -6,17 +7,7 @@ test.describe("Conduit API suite", () => {
   let authToken: string;
 
   test.beforeAll("Run before all tests", async ({ api, config }) => {
-    const loginResponse = await api
-      .path("/users/login")
-      .body({
-        user: {
-          email: config.userEmail,
-          password: config.userPassword,
-        },
-      })
-      .postRequest(200);
-
-    authToken = `Token ${loginResponse.user.token}`;
+    authToken = await createToken(config.userEmail, config.userPassword);
   });
 
   test("Get All Articles", async ({ api }) => {
