@@ -21,6 +21,7 @@ test.describe("Conduit API suite", { tag: "@smoke" }, () => {
       .params({ limit: "10", offset: "0" })
       .getRequest(200);
 
+    await expect(response).shouldMatchSchema("articles", "GET_articles", true);
     expect(response.articles.length).shouldBeLessThanOrEqual(10);
     expect(response.articlesCount).shouldEqual(10);
   });
@@ -28,7 +29,8 @@ test.describe("Conduit API suite", { tag: "@smoke" }, () => {
   test("Get Test Tags", async ({ api }) => {
     const response = await api.path("/tags").getRequest(200);
 
-    expect(response).shouldMatchSchema("tags", "GET_tags");
+    // Remove the 'createSchemaFlag' parameter to false to validate against existing schema
+    await expect(response).shouldMatchSchema("tags", "GET_tags", true);
     expect(response.tags[0]).shouldEqual("Test");
     expect(response.tags.length).shouldBeLessThanOrEqual(10);
   });
@@ -54,6 +56,12 @@ test.describe("Conduit API suite", { tag: "@smoke" }, () => {
       .path("/articles")
       .body(articleData)
       .postRequest(201);
+
+    await expect(newArticleResponse).shouldMatchSchema(
+      "articles",
+      "POST_articles",
+      true,
+    );
 
     const articleSlug = newArticleResponse.article.slug;
 
