@@ -1,4 +1,3 @@
-import { createToken } from "../helpers/create-token";
 import { expect } from "../utils/custom-expect";
 import { test } from "../utils/fixtures";
 import { faker } from "@faker-js/faker";
