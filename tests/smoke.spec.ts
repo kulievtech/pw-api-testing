@@ -1,7 +1,6 @@
 import { expect } from "../utils/custom-expect";
 import { getRandomArticle, updateArticleData } from "../utils/data-generator";
 import { test } from "../utils/fixtures";
-import { faker } from "@faker-js/faker";
 
 test.describe("Conduit API suite", { tag: "@smoke" }, () => {
   test("Get All Articles without Auth", async ({ api }) => {
