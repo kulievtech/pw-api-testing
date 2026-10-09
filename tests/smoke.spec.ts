@@ -1,7 +1,7 @@
 import { expect } from "../utils/custom-expect";
+import { getRandomArticle, updateArticleData } from "../utils/data-generator";
 import { test } from "../utils/fixtures";
 import { faker } from "@faker-js/faker";
-import { validateSchema } from "../utils/schema-validator";
 
 test.describe("Conduit API suite", { tag: "@smoke" }, () => {
   test("Get All Articles without Auth", async ({ api }) => {
@@ -36,25 +36,12 @@ test.describe("Conduit API suite", { tag: "@smoke" }, () => {
   });
 
   test("Create and Delete Article", async ({ api }) => {
-    // Generate random article data using faker
-    const articleTitle = faker.lorem.words(3);
-    const articleDescription = faker.lorem.sentence();
-    const articleBody = faker.lorem.paragraph();
-    const articleTags = [faker.lorem.word(), faker.lorem.word()];
-
-    const articleData = {
-      article: {
-        title: articleTitle,
-        description: articleDescription,
-        body: articleBody,
-        tagList: articleTags,
-      },
-    };
+    const articleRequest = getRandomArticle();
 
     // Create a new article
     const newArticleResponse = await api
       .path("/articles")
-      .body(articleData)
+      .body(articleRequest)
       .postRequest(201);
 
     await expect(newArticleResponse).shouldMatchSchema(
@@ -65,13 +52,19 @@ test.describe("Conduit API suite", { tag: "@smoke" }, () => {
 
     const articleSlug = newArticleResponse.article.slug;
 
-    expect(newArticleResponse.article.title).shouldEqual(articleTitle);
-    expect(newArticleResponse.article.description).shouldEqual(
-      articleDescription,
+    expect(newArticleResponse.article.title).shouldEqual(
+      articleRequest.article.title,
     );
-    expect(newArticleResponse.article.body).shouldEqual(articleBody);
+    expect(newArticleResponse.article.description).shouldEqual(
+      articleRequest.article.description,
+    );
+    expect(newArticleResponse.article.body).shouldEqual(
+      articleRequest.article.body,
+    );
 
-    const expectedTags = articleTags.map((tag) => tag.toLowerCase()).sort();
+    const expectedTags = articleRequest.article.tagList
+      .map((tag) => tag.toLowerCase())
+      .sort();
 
     const actualTags = newArticleResponse.article.tagList
       .map((tag: string) => tag.toLowerCase())
@@ -84,36 +77,29 @@ test.describe("Conduit API suite", { tag: "@smoke" }, () => {
   });
 
   test("Create, Update, and Delete Article", async ({ api }) => {
-    // Generate random article data using faker
-    const articleTitle = faker.lorem.words(3);
-    const articleDescription = faker.lorem.sentence();
-    const articleBody = faker.lorem.paragraph();
-    const articleTags = [faker.lorem.word(), faker.lorem.word()];
-
-    const articleData = {
-      article: {
-        title: articleTitle,
-        description: articleDescription,
-        body: articleBody,
-        tagList: articleTags,
-      },
-    };
+    const articleRequest = getRandomArticle();
 
     // Create a new article
     const newArticleResponse = await api
       .path("/articles")
-      .body(articleData)
+      .body(articleRequest)
       .postRequest(201);
 
     const articleSlug = newArticleResponse.article.slug;
 
-    expect(newArticleResponse.article.title).shouldEqual(articleTitle);
-    expect(newArticleResponse.article.description).shouldEqual(
-      articleDescription,
+    expect(newArticleResponse.article.title).shouldEqual(
+      articleRequest.article.title,
     );
-    expect(newArticleResponse.article.body).shouldEqual(articleBody);
+    expect(newArticleResponse.article.description).shouldEqual(
+      articleRequest.article.description,
+    );
+    expect(newArticleResponse.article.body).shouldEqual(
+      articleRequest.article.body,
+    );
 
-    const expectedTags = articleTags.map((tag) => tag.toLowerCase()).sort();
+    const expectedTags = articleRequest.article.tagList
+      .map((tag) => tag.toLowerCase())
+      .sort();
 
     const actualTags = newArticleResponse.article.tagList
       .map((tag: string) => tag.toLowerCase())
@@ -122,14 +108,7 @@ test.describe("Conduit API suite", { tag: "@smoke" }, () => {
     expect(actualTags).shouldEqual(expectedTags);
 
     // Update the created article
-    const updatedArticleData = {
-      article: {
-        title: faker.lorem.words(4),
-        description: faker.lorem.sentence(),
-        body: faker.lorem.paragraph(),
-        tagList: [faker.lorem.word(), faker.lorem.word()],
-      },
-    };
+    const updatedArticleData = updateArticleData();
 
     const updatedArticleResponse = await api
       .path(`/articles/${articleSlug}`)
