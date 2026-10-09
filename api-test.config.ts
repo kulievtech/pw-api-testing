@@ -1,23 +1,16 @@
-import "dotenv/config";
+import dotenv from "dotenv";
+import path from "path";
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
-function requireEnv(name: string): string {
-  const value = process.env[name];
+const processEnv = process.env.TEST_ENV;
+const env = processEnv || "dev";
 
-  if (!value) {
-    throw new Error(`Missing environment variable: ${name}`);
-  }
-
-  return value;
-}
-
-const env = process.env.TEST_ENV || "dev";
-
-console.log(`Test Environment is: ${env}`);
+console.log(`Running tests in '${env}' environment`);
 
 const config = {
-  baseUrl: requireEnv("BASE_URL"),
-  userEmail: requireEnv("USER_EMAIL"),
-  userPassword: requireEnv("USER_PASSWORD"),
+  baseUrl: process.env.BASE_URL,
+  userEmail: process.env.USER_EMAIL,
+  userPassword: process.env.USER_PASSWORD,
 };
 
 export { config };
