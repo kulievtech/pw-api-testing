@@ -10,6 +10,7 @@ test.describe("Conduit API suite", { tag: "@smoke" }, () => {
       .clearAuth()
       .getRequest(200);
 
+    await expect(response).shouldMatchSchema("articles", "GET_articles", true);
     expect(response.articles.length).shouldBeLessThanOrEqual(10);
     expect(response.articlesCount).shouldEqual(10);
   });
@@ -84,6 +85,12 @@ test.describe("Conduit API suite", { tag: "@smoke" }, () => {
       .body(articleRequest)
       .postRequest(201);
 
+    await expect(newArticleResponse).shouldMatchSchema(
+      "articles",
+      "POST_articles",
+      true,
+    );
+
     const articleSlug = newArticleResponse.article.slug;
 
     expect(newArticleResponse.article.title).shouldEqual(
@@ -113,6 +120,12 @@ test.describe("Conduit API suite", { tag: "@smoke" }, () => {
       .path(`/articles/${articleSlug}`)
       .body(updatedArticleData)
       .putRequest(200);
+
+    await expect(updatedArticleResponse).shouldMatchSchema(
+      "articles",
+      "PUT_articles",
+      true,
+    );
 
     const updatedArticleSlug = updatedArticleResponse.article.slug;
 
