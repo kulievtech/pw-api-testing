@@ -53,7 +53,7 @@ Authentication is created per worker through [helpers/create-token.ts](helpers/c
 - Schema validation logic is in [utils/schema-validator.ts](utils/schema-validator.ts)
 - JSON schemas for endpoint validation are stored under [response-schemas](response-schemas)
 
-For API assertions, prefer `expect(response).shouldMatchSchema("<group>", "<schema>", true)` when matching an endpoint contract.
+For API assertions, use `expect(response).shouldMatchSchema("<group>", "<schema>")` to validate against the existing response schema. When an endpoint schema is missing or needs to be updated, temporarily pass `true` as the third argument to generate or regenerate it, then remove the flag after running the request so subsequent tests validate against the checked-in schema.
 
 ## Testing conventions
 
