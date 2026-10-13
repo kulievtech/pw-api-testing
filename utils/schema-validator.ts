@@ -12,7 +12,6 @@ export async function validateSchema(
   dirName: string,
   fileName: string,
   responseBody: object,
-  createSchemaFlag: boolean = false,
 ) {
   const schemaPath = path.join(
     SCHEMA_BASE_PATH,
@@ -20,7 +19,7 @@ export async function validateSchema(
     `${fileName}_schema.json`,
   );
 
-  if (createSchemaFlag) {
+  if (process.env.UPDATE_SCHEMAS === "true") {
     await generateSchemaFromResponse(responseBody, schemaPath);
   }
 

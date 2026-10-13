@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "update-schemas": "UPDATE_SCHEMAS=true playwright test --project=api-testing --no-deps"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",

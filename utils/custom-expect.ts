@@ -13,27 +13,18 @@ declare global {
     interface Matchers<R, T> {
       shouldEqual(expected: T): R;
       shouldBeLessThanOrEqual(expected: T): R;
-      shouldMatchSchema(
-        dirName: string,
-        fileName: string,
-        createSchemaFlag?: boolean,
-      ): Promise<R>;
+      shouldMatchSchema(dirName: string, fileName: string): Promise<R>;
     }
   }
 }
 
 export const expect = baseExpect.extend({
-  async shouldMatchSchema(
-    received: any,
-    dirName: string,
-    fileName: string,
-    createSchemaFlag: boolean = false,
-  ) {
+  async shouldMatchSchema(received: any, dirName: string, fileName: string) {
     let pass: boolean;
     let message: string = "";
 
     try {
-      await validateSchema(dirName, fileName, received, createSchemaFlag);
+      await validateSchema(dirName, fileName, received);
       pass = true;
       message = "Schema validation passed";
     } catch (e: any) {
